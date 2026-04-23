@@ -157,6 +157,13 @@ export function computeResults(
     let rawFree = 0;
     const isUncapped = uncappedOrders.has(orderId);
 
+    // Track remaining basket capacity per free collection so multiple codes
+    // sharing the same pool can't double-claim the same physical units.
+    const basketRemaining: Record<"IVG_DEALS" | "PROMO_PODS", number> = {
+      IVG_DEALS: ivgQty,
+      PROMO_PODS: podQty,
+    };
+
     for (const code of codesUsed) {
       const rule = ruleMap.get(code.toUpperCase());
       if (!rule) {
@@ -165,14 +172,25 @@ export function computeResults(
       }
       const qualifyingQty = rule.buyCollection === "IVG_DEALS" ? ivgQty : products.reduce((s, p) => s + p.qty, 0);
       const possibleUses = Math.floor(qualifyingQty / rule.buyQty);
-      const uses = isUncapped ? possibleUses : Math.min(possibleUses, rule.maxUses);
-      const free = uses * rule.freeQty;
-      if (uses === 0) {
+      const usesByRule = isUncapped ? possibleUses : Math.min(possibleUses, rule.maxUses);
+      const entitlement = usesByRule * rule.freeQty;
+
+      // Cap entitlement by what's actually in the basket from the free collection.
+      const basketCap = basketRemaining[rule.freeCollection];
+      const free = Math.min(entitlement, basketCap);
+      basketRemaining[rule.freeCollection] = Math.max(0, basketCap - free);
+
+      if (usesByRule === 0) {
         notes.push(`Code "${code}" applied but only ${qualifyingQty} qualifying items (need ${rule.buyQty})`);
+      }
+      if (free < entitlement) {
+        notes.push(
+          `Code "${code}" entitlement ${entitlement} capped to ${free} — only ${basketCap} ${rule.freeCollection === "PROMO_PODS" ? "promo pod" : "IVG deals"} unit(s) available in basket`
+        );
       }
       applied.push({
         code,
-        uses,
+        uses: usesByRule,
         freePerUse: rule.freeQty,
         freeCollection: rule.freeCollection,
         rawFree: free,
@@ -180,15 +198,12 @@ export function computeResults(
       rawFree += free;
     }
 
-    // Choose cheapest eligible items from the relevant free collection to value the freebies.
-    // Build a flat list of unit instances from products in the appropriate collections.
+    // Value the freebies using cheapest eligible items from the relevant free collection.
     const valueCollection = (col: "IVG_DEALS" | "PROMO_PODS") =>
       col === "IVG_DEALS" ? ivgItems : podItems;
 
-    // For valuation we cap by rule (already in `rawFree`) — uncapped order uses raw possible uses above.
     let totalFreeUnits = applied.reduce((s, a) => s + a.rawFree, 0);
 
-    // Build cheapest-unit pool from union of free collections used
     const cols = new Set(applied.map((a) => a.freeCollection));
     const pool: number[] = [];
     cols.forEach((c) => {
@@ -199,10 +214,6 @@ export function computeResults(
     pool.sort((a, b) => a - b);
     const valued = pool.slice(0, totalFreeUnits);
     const freeValue = valued.reduce((s, p) => s + p, 0);
-
-    if (totalFreeUnits > pool.length) {
-      notes.push(`Calculated ${totalFreeUnits} free units but only ${pool.length} eligible units in order`);
-    }
 
     results.push({
       orderId,
