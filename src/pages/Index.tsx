@@ -70,6 +70,27 @@ const Index = () => {
     [lines]
   );
 
+  const diagnostics = useMemo(() => {
+    if (!lines.length) return null;
+    const products = lines.filter((l) => l.rowType === "product");
+    const discounts = lines.filter((l) => l.rowType === "discount");
+    const codesFound = Array.from(
+      new Set(discounts.map((d) => (d.discountCode || "").trim()).filter(Boolean))
+    );
+    const ruleCodes = new Set(rules.map((r) => r.code.toUpperCase()));
+    const matched = codesFound.filter((c) => ruleCodes.has(c.toUpperCase()));
+    const unmatched = codesFound.filter((c) => !ruleCodes.has(c.toUpperCase()));
+    return {
+      totalLines: lines.length,
+      orderCount: allOrderIds.length,
+      productLines: products.length,
+      discountLines: discounts.length,
+      codesFound,
+      matched,
+      unmatched,
+    };
+  }, [lines, rules, allOrderIds]);
+
   const toggleUncapped = (id: string) => {
     setUncapped((prev) => {
       const next = new Set(prev);
