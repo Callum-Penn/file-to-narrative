@@ -70,6 +70,27 @@ const Index = () => {
     [lines]
   );
 
+  const diagnostics = useMemo(() => {
+    if (!lines.length) return null;
+    const products = lines.filter((l) => l.rowType === "product");
+    const discounts = lines.filter((l) => l.rowType === "discount");
+    const codesFound = Array.from(
+      new Set(discounts.map((d) => (d.discountCode || "").trim()).filter(Boolean))
+    );
+    const ruleCodes = new Set(rules.map((r) => r.code.toUpperCase()));
+    const matched = codesFound.filter((c) => ruleCodes.has(c.toUpperCase()));
+    const unmatched = codesFound.filter((c) => !ruleCodes.has(c.toUpperCase()));
+    return {
+      totalLines: lines.length,
+      orderCount: allOrderIds.length,
+      productLines: products.length,
+      discountLines: discounts.length,
+      codesFound,
+      matched,
+      unmatched,
+    };
+  }, [lines, rules, allOrderIds]);
+
   const toggleUncapped = (id: string) => {
     setUncapped((prev) => {
       const next = new Set(prev);
@@ -405,10 +426,81 @@ const Index = () => {
           </>
         )}
 
+        {diagnostics && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">What we found in your file</CardTitle>
+              <CardDescription>
+                Use this to confirm the orders sheet was read correctly.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-4 md:grid-cols-4 text-sm">
+              <div>
+                <p className="text-muted-foreground text-xs uppercase tracking-wide">Rows parsed</p>
+                <p className="text-xl font-semibold">{diagnostics.totalLines}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground text-xs uppercase tracking-wide">Orders</p>
+                <p className="text-xl font-semibold">{diagnostics.orderCount}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground text-xs uppercase tracking-wide">Product lines</p>
+                <p className="text-xl font-semibold">{diagnostics.productLines}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground text-xs uppercase tracking-wide">Discount lines</p>
+                <p className="text-xl font-semibold">{diagnostics.discountLines}</p>
+              </div>
+              <div className="md:col-span-4 space-y-2">
+                <p className="text-muted-foreground text-xs uppercase tracking-wide">
+                  Discount codes detected ({diagnostics.codesFound.length})
+                </p>
+                {diagnostics.codesFound.length === 0 ? (
+                  <p className="text-muted-foreground">
+                    No discount codes were found. Check that your export includes a "Line: Type" column
+                    with "Discount" rows and a "Line: Name" column with the code.
+                  </p>
+                ) : (
+                  <div className="flex flex-wrap gap-1">
+                    {diagnostics.matched.map((c) => (
+                      <Badge key={c} variant="default" className="font-mono text-[10px]">
+                        ✓ {c}
+                      </Badge>
+                    ))}
+                    {diagnostics.unmatched.map((c) => (
+                      <Badge
+                        key={c}
+                        variant="outline"
+                        className="font-mono text-[10px] border-warning/50 text-warning-foreground"
+                      >
+                        ? {c}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+                {diagnostics.unmatched.length > 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    Codes marked "?" aren't in your Deal rules tab — add them to include those orders.
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {!results.length && lines.length > 0 && (
           <Card>
             <CardContent className="py-10 text-center text-muted-foreground">
-              No orders matched any of your deal codes. Check the Deal rules tab.
+              No orders matched any of your deal codes. See the diagnostics above and check the Deal rules tab.
+            </CardContent>
+          </Card>
+        )}
+
+        {lines.length === 0 && fileName && (
+          <Card>
+            <CardContent className="py-10 text-center text-muted-foreground">
+              The file loaded but no rows were detected. The orders sheet may use unexpected column names —
+              expected columns include "Name" (order ID), "Line: Type", "Line: Name", "Line: Quantity", "Line: Price".
             </CardContent>
           </Card>
         )}
