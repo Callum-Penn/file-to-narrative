@@ -270,9 +270,8 @@ const Index = () => {
                           <TableHead>Order</TableHead>
                           <TableHead>Postcode</TableHead>
                           <TableHead>Codes</TableHead>
-                          <TableHead className="text-right">IVG qty</TableHead>
-                          <TableHead className="text-right">Pods qty</TableHead>
-                          <TableHead className="text-right">Free units</TableHead>
+                          <TableHead className="text-right">Free kits</TableHead>
+                          <TableHead className="text-right">Free pods</TableHead>
                           <TableHead>Notes</TableHead>
                         </TableRow>
                       </TableHeader>
