@@ -27,6 +27,8 @@ export type OrderResult = {
   appliedRules: AppliedRule[];
   rawFreeUnits: number;
   cappedFreeUnits: number;
+  freeKitsUnits: number;
+  freePodsUnits: number;
   freeValue: number;
   uncapped: boolean;
   notes: string[];
