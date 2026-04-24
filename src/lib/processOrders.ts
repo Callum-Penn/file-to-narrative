@@ -27,6 +27,8 @@ export type OrderResult = {
   appliedRules: AppliedRule[];
   rawFreeUnits: number;
   cappedFreeUnits: number;
+  freeKitsUnits: number;
+  freePodsUnits: number;
   freeValue: number;
   uncapped: boolean;
   notes: string[];
@@ -228,6 +230,13 @@ export function computeResults(
 
     const postcode = items.find((i) => i.postcode)?.postcode || "";
 
+    const freeKitsUnits = applied
+      .filter((a) => a.freeCollection === "IVG_DEALS")
+      .reduce((s, a) => s + a.rawFree, 0);
+    const freePodsUnits = applied
+      .filter((a) => a.freeCollection === "PROMO_PODS")
+      .reduce((s, a) => s + a.rawFree, 0);
+
     results.push({
       orderId,
       postcode,
@@ -239,6 +248,8 @@ export function computeResults(
       appliedRules: applied,
       rawFreeUnits: applied.reduce((s, a) => s + a.uses * a.freePerUse, 0),
       cappedFreeUnits: totalFreeUnits,
+      freeKitsUnits,
+      freePodsUnits,
       freeValue,
       uncapped: isUncapped,
       notes,
@@ -258,6 +269,8 @@ export function exportResultsToXlsx(results: OrderResult[]): Blob {
     "Total Qty": r.totalQty,
     "IVG Deals Qty": r.ivgDealsQty,
     "Promo Pods Qty": r.promoPodsQty,
+    "Free Kits": r.freeKitsUnits,
+    "Free Pods": r.freePodsUnits,
     "Free Units": r.cappedFreeUnits,
     "Free Value (£)": Number(r.freeValue.toFixed(2)),
     "Total Discount (£)": Number(r.totalDiscount.toFixed(2)),
@@ -271,6 +284,8 @@ export function exportResultsToXlsx(results: OrderResult[]): Blob {
     "Total Qty": results.reduce((s, r) => s + r.totalQty, 0),
     "IVG Deals Qty": results.reduce((s, r) => s + r.ivgDealsQty, 0),
     "Promo Pods Qty": results.reduce((s, r) => s + r.promoPodsQty, 0),
+    "Free Kits": results.reduce((s, r) => s + r.freeKitsUnits, 0),
+    "Free Pods": results.reduce((s, r) => s + r.freePodsUnits, 0),
     "Free Units": results.reduce((s, r) => s + r.cappedFreeUnits, 0),
     "Free Value (£)": Number(results.reduce((s, r) => s + r.freeValue, 0).toFixed(2)),
     "Total Discount (£)": Number(results.reduce((s, r) => s + r.totalDiscount, 0).toFixed(2)),

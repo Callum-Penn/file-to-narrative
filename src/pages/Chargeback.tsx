@@ -270,9 +270,8 @@ const Index = () => {
                           <TableHead>Order</TableHead>
                           <TableHead>Postcode</TableHead>
                           <TableHead>Codes</TableHead>
-                          <TableHead className="text-right">IVG qty</TableHead>
-                          <TableHead className="text-right">Pods qty</TableHead>
-                          <TableHead className="text-right">Free units</TableHead>
+                          <TableHead className="text-right">Free kits</TableHead>
+                          <TableHead className="text-right">Free pods</TableHead>
                           <TableHead>Notes</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -297,14 +296,8 @@ const Index = () => {
                                 ))}
                               </div>
                             </TableCell>
-                            <TableCell className="text-right">{r.ivgDealsQty}</TableCell>
-                            <TableCell className="text-right">{r.promoPodsQty}</TableCell>
-                            <TableCell className="text-right font-medium">
-                              {r.cappedFreeUnits}
-                              {r.rawFreeUnits !== r.cappedFreeUnits && (
-                                <span className="text-xs text-muted-foreground"> / {r.rawFreeUnits}</span>
-                              )}
-                            </TableCell>
+                            <TableCell className="text-right font-medium">{r.freeKitsUnits || "—"}</TableCell>
+                            <TableCell className="text-right font-medium">{r.freePodsUnits || "—"}</TableCell>
                             <TableCell>
                               {r.notes.length > 0 && (
                                 <div className="flex items-start gap-1 text-xs text-muted-foreground">
