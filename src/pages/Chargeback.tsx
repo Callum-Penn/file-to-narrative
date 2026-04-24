@@ -222,6 +222,7 @@ const Index = () => {
                       <TableHeader>
                         <TableRow>
                           <TableHead>Order</TableHead>
+                          <TableHead>Postcode</TableHead>
                           <TableHead>Codes</TableHead>
                           <TableHead className="text-right">IVG qty</TableHead>
                           <TableHead className="text-right">Pods qty</TableHead>
@@ -241,6 +242,7 @@ const Index = () => {
                                 </Badge>
                               )}
                             </TableCell>
+                            <TableCell className="font-mono text-xs text-muted-foreground">{r.postcode || "—"}</TableCell>
                             <TableCell className="max-w-[280px]">
                               <div className="flex flex-wrap gap-1">
                                 {r.codes.map((c, i) => (

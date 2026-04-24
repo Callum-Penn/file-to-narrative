@@ -13,10 +13,12 @@ export type LineItem = {
   rowType: "product" | "discount" | "shipping" | "other";
   discountCode?: string;
   discountValue?: number;
+  postcode?: string;
 };
 
 export type OrderResult = {
   orderId: string;
+  postcode: string;
   codes: string[];
   totalQty: number;
   ivgDealsQty: number;
@@ -47,6 +49,11 @@ const COL_ALIASES = {
   unitPrice: ["Line: Price", "Price", "Unit Price"],
   lineTotal: ["Line: Total", "Total", "Line Total"],
   lineDiscount: ["Line: Discount", "Discount", "Discount Amount"],
+  postcode: [
+    "Shipping: Zip", "Shipping Zip", "Shipping Postcode", "Shipping Post Code",
+    "Billing: Zip", "Billing Zip", "Billing Postcode", "Billing Post Code",
+    "Postcode", "Post Code", "Zip", "Zip Code", "Postal Code",
+  ],
 };
 
 function pick(row: RawRow, keys: string[]): any {
@@ -93,6 +100,8 @@ export function parseWorkbook(file: ArrayBuffer): { rows: LineItem[]; sheetName:
     const unitPrice = toNum(pick(r, COL_ALIASES.unitPrice));
     const lineTotal = toNum(pick(r, COL_ALIASES.lineTotal));
     const lineDiscount = toNum(pick(r, COL_ALIASES.lineDiscount));
+    const postcodeRaw = pick(r, COL_ALIASES.postcode);
+    const postcode = postcodeRaw ? String(postcodeRaw).trim().toUpperCase() : undefined;
 
     if (!currentOrder || (!name && !sku && !typeRaw)) continue;
 
@@ -109,6 +118,7 @@ export function parseWorkbook(file: ArrayBuffer): { rows: LineItem[]; sheetName:
       unitPrice,
       lineTotal,
       rowType,
+      postcode,
     };
     if (rowType === "discount") {
       item.discountCode = name;
@@ -215,8 +225,11 @@ export function computeResults(
     const valued = pool.slice(0, totalFreeUnits);
     const freeValue = valued.reduce((s, p) => s + p, 0);
 
+    const postcode = items.find((i) => i.postcode)?.postcode || "";
+
     results.push({
       orderId,
+      postcode,
       codes: codesUsed,
       totalQty: products.reduce((s, p) => s + p.qty, 0),
       ivgDealsQty: ivgQty,
@@ -238,6 +251,7 @@ export function computeResults(
 export function exportResultsToXlsx(results: OrderResult[]): Blob {
   const summary = results.map((r) => ({
     "Order ID": r.orderId,
+    "Postcode": r.postcode,
     "Codes Used": r.codes.join(", "),
     "Uncapped": r.uncapped ? "YES" : "",
     "Total Qty": r.totalQty,
@@ -250,6 +264,7 @@ export function exportResultsToXlsx(results: OrderResult[]): Blob {
   }));
   const totals = {
     "Order ID": "TOTAL",
+    "Postcode": "",
     "Codes Used": "",
     "Uncapped": "",
     "Total Qty": results.reduce((s, r) => s + r.totalQty, 0),
