@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { Upload, Download, FileSpreadsheet, Settings2, Sparkles, AlertTriangle, LogOut, UserPlus } from "lucide-react";
+import { Upload, Download, FileSpreadsheet, Settings2, Sparkles, AlertTriangle, LogOut, UserPlus, Info } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
