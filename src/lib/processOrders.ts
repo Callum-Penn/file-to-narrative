@@ -230,6 +230,13 @@ export function computeResults(
 
     const postcode = items.find((i) => i.postcode)?.postcode || "";
 
+    const freeKitsUnits = applied
+      .filter((a) => a.freeCollection === "IVG_DEALS")
+      .reduce((s, a) => s + a.rawFree, 0);
+    const freePodsUnits = applied
+      .filter((a) => a.freeCollection === "PROMO_PODS")
+      .reduce((s, a) => s + a.rawFree, 0);
+
     results.push({
       orderId,
       postcode,
@@ -241,6 +248,8 @@ export function computeResults(
       appliedRules: applied,
       rawFreeUnits: applied.reduce((s, a) => s + a.uses * a.freePerUse, 0),
       cappedFreeUnits: totalFreeUnits,
+      freeKitsUnits,
+      freePodsUnits,
       freeValue,
       uncapped: isUncapped,
       notes,
