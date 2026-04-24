@@ -8,8 +8,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { Upload, Download, FileSpreadsheet, Settings2, Sparkles, AlertTriangle } from "lucide-react";
+import { Upload, Download, FileSpreadsheet, Settings2, Sparkles, AlertTriangle, LogOut, UserPlus } from "lucide-react";
 import { toast } from "sonner";
+import { Link } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import {
   parseWorkbook,
   computeResults,
@@ -35,6 +37,7 @@ const Index = () => {
   const [uncapped, setUncapped] = useState<Set<string>>(new Set(["VL-43387"]));
   const [busy, setBusy] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { user, isAdmin, signOut } = useAuth();
 
   const handleFile = useCallback(async (file: File) => {
     setBusy(true);
@@ -124,11 +127,23 @@ const Index = () => {
               <p className="text-xs text-muted-foreground">Upload an orders export — get free items, by code.</p>
             </div>
           </div>
-          {results.length > 0 && (
-            <Button onClick={downloadReport} variant="default" className="gap-2">
-              <Download className="h-4 w-4" /> Download report
-            </Button>
-          )}
+          <div className="flex items-center gap-2">
+            {results.length > 0 && (
+              <Button onClick={downloadReport} variant="default" className="gap-2">
+                <Download className="h-4 w-4" /> Download report
+              </Button>
+            )}
+            {isAdmin && (
+              <Button asChild variant="outline" size="sm" className="gap-2">
+                <Link to="/admin/invite"><UserPlus className="h-4 w-4" /> Invite user</Link>
+              </Button>
+            )}
+            {user && (
+              <Button onClick={signOut} variant="ghost" size="sm" className="gap-2">
+                <LogOut className="h-4 w-4" /> Sign out
+              </Button>
+            )}
+          </div>
         </div>
       </header>
 
