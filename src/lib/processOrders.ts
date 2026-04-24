@@ -50,9 +50,10 @@ const COL_ALIASES = {
   lineTotal: ["Line: Total", "Total", "Line Total"],
   lineDiscount: ["Line: Discount", "Discount", "Discount Amount"],
   postcode: [
-    "Shipping: Zip", "Shipping Zip", "Shipping Postcode", "Shipping Post Code",
-    "Billing: Zip", "Billing Zip", "Billing Postcode", "Billing Post Code",
-    "Postcode", "Post Code", "Zip", "Zip Code", "Postal Code",
+    "Shipping: Zip", "Shipping Zip", "Shipping Postcode", "Shipping Post Code", "Shipping Zip Code", "Shipping: Zip Code", "Shipping: Postcode", "Shipping: Post Code", "Shipping: Postal Code", "Shipping Postal Code",
+    "Billing: Zip", "Billing Zip", "Billing Postcode", "Billing Post Code", "Billing Zip Code", "Billing: Zip Code", "Billing: Postcode", "Billing: Post Code", "Billing: Postal Code", "Billing Postal Code",
+    "Customer: Shipping Zip", "Customer: Billing Zip", "Customer Shipping Zip", "Customer Billing Zip",
+    "Postcode", "Post Code", "Zip", "Zip Code", "Postal Code", "ZIP", "PostCode",
   ],
 };
 

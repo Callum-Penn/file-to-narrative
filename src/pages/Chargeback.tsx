@@ -227,7 +227,6 @@ const Index = () => {
                           <TableHead className="text-right">IVG qty</TableHead>
                           <TableHead className="text-right">Pods qty</TableHead>
                           <TableHead className="text-right">Free units</TableHead>
-                          <TableHead className="text-right">Chargeback</TableHead>
                           <TableHead>Notes</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -260,7 +259,6 @@ const Index = () => {
                                 <span className="text-xs text-muted-foreground"> / {r.rawFreeUnits}</span>
                               )}
                             </TableCell>
-                            <TableCell className="text-right font-semibold text-primary">{fmtGBP(r.freeValue)}</TableCell>
                             <TableCell>
                               {r.notes.length > 0 && (
                                 <div className="flex items-start gap-1 text-xs text-muted-foreground">
