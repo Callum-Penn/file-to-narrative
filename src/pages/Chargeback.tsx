@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { Upload, Download, FileSpreadsheet, Settings2, Sparkles, AlertTriangle, LogOut, UserPlus } from "lucide-react";
+import { Upload, Download, FileSpreadsheet, Settings2, Sparkles, AlertTriangle, LogOut, UserPlus, Info } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -189,6 +189,52 @@ const Index = () => {
                 {busy ? "Reading…" : fileName ? "Replace file" : "Choose file"}
               </Button>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* MATRIXIFY INSTRUCTIONS */}
+        <Card className="shadow-card">
+          <CardHeader>
+            <div className="flex items-start gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary shrink-0">
+                <Info className="h-5 w-5" />
+              </div>
+              <div>
+                <CardTitle className="text-base">Matrixify export instructions</CardTitle>
+                <CardDescription>
+                  Export Orders from Matrixify in Shopify, and make sure these columns are selected before downloading.
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <p className="text-sm font-medium mb-2">Order-level columns</p>
+              <div className="flex flex-wrap gap-1.5">
+                {["Name", "Shipping: Zip"].map((c) => (
+                  <Badge key={c} variant="outline" className="font-mono text-[11px]">{c}</Badge>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="text-sm font-medium mb-2">Line item columns</p>
+              <div className="flex flex-wrap gap-1.5">
+                {[
+                  "Line: Type",
+                  "Line: Name",
+                  "Line: SKU",
+                  "Line: Quantity",
+                  "Line: Price",
+                  "Line: Total",
+                  "Line: Discount",
+                ].map((c) => (
+                  <Badge key={c} variant="outline" className="font-mono text-[11px]">{c}</Badge>
+                ))}
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Tip: in Matrixify, set Export type to <span className="font-medium">Orders</span>, then under "Select columns" tick the fields above. Common aliases (e.g. "Zip Code", "Postal Code") are also detected automatically.
+            </p>
           </CardContent>
         </Card>
 
