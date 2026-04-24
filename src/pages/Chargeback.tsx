@@ -241,10 +241,9 @@ const Index = () => {
         {results.length > 0 && (
           <>
             {/* TOTALS */}
-            <div className="grid gap-4 md:grid-cols-4">
+            <div className="grid gap-4 md:grid-cols-3">
               <StatCard label="Orders with codes" value={totals.orders.toString()} />
               <StatCard label="Free units" value={totals.freeUnits.toString()} />
-              <StatCard label="Chargeback value" value={fmtGBP(totals.freeValue)} accent />
               <StatCard label="Discount on file" value={fmtGBP(totals.discount)} muted />
             </div>
 
